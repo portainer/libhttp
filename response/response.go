@@ -1,3 +1,4 @@
+// Package response provides convenience functions to write into a http.ResponseWriter.
 package response
 
 import (

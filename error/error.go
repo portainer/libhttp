@@ -1,3 +1,4 @@
+// Package error provides error/logging functions that can be used in conjuction with http.Handler.
 package error
 
 import (

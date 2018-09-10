@@ -1,3 +1,6 @@
+// Package request provides function to retrieve content from a *http.Request object of the net/http standard library,
+// be it JSON body payload, multi-part form values or query parameters.
+// It also provides functions to retrieve route variables when using gorilla/mux.
 package request
 
 import (
