@@ -36,19 +36,20 @@ func DecodeAndValidateJSONPayload(request *http.Request, v PayloadValidation) er
 	return v.Validate(request)
 }
 
-// RetrieveMultiPartFormFile returns the content of an uploaded file (form data) as bytes.
-func RetrieveMultiPartFormFile(request *http.Request, requestParameter string) ([]byte, error) {
-	file, _, err := request.FormFile(requestParameter)
+// RetrieveMultiPartFormFile returns the content of an uploaded file (form data) as bytes as well
+// as the name of the uploaded file.
+func RetrieveMultiPartFormFile(request *http.Request, requestParameter string) ([]byte, string, error) {
+	file, headers, err := request.FormFile(requestParameter)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer file.Close()
 
 	fileContent, err := ioutil.ReadAll(file)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	return fileContent, nil
+	return fileContent, headers.Filename, nil
 }
 
 // RetrieveMultiPartFormJSONValue decodes the value of some form data as a JSON object into the target parameter.
