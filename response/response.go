@@ -3,6 +3,8 @@ package response
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -17,6 +19,25 @@ func JSON(rw http.ResponseWriter, data interface{}) *httperror.HandlerError {
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to write JSON response", err}
 	}
+
+	return nil
+}
+
+// JSON encodes data to rw in YAML format. Returns a pointer to a
+// HandlerError if encoding fails.
+func YAML(rw http.ResponseWriter, data interface{}) *httperror.HandlerError {
+	rw.Header().Set("Content-Type", "text/yaml")
+
+	strData, ok := data.(string)
+	if !ok {
+		return &httperror.HandlerError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Unable to write YAML response",
+			Err:        errors.New("failed to convert input to string"),
+		}
+	}
+
+	fmt.Fprint(rw, strData)
 
 	return nil
 }
