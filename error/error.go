@@ -3,6 +3,7 @@ package error
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 )
@@ -10,13 +11,6 @@ import (
 type (
 	// LoggerHandler defines a HTTP handler that includes a HandlerError return pointer
 	LoggerHandler func(http.ResponseWriter, *http.Request) *HandlerError
-
-	// HandlerError represents an error raised inside a HTTP handler
-	HandlerError struct {
-		StatusCode int
-		Message    string
-		Err        error
-	}
 
 	errorResponse struct {
 		Message string `json:"message,omitempty"`
@@ -32,9 +26,14 @@ func (handler LoggerHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 }
 
 func writeErrorResponse(rw http.ResponseWriter, err *HandlerError) {
+	if err.Err == nil {
+		err.Err = errors.New(err.Message)
+	}
+
 	log.Printf("http error: %s (err=%s) (code=%d)\n", err.Message, err.Err, err.StatusCode)
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(err.StatusCode)
+
 	json.NewEncoder(rw).Encode(&errorResponse{Message: err.Message, Details: err.Err.Error()})
 }
 
