@@ -17,7 +17,7 @@ func JSON(rw http.ResponseWriter, data interface{}) *httperror.HandlerError {
 
 	err := json.NewEncoder(rw).Encode(data)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to write JSON response", err}
+		return httperror.InternalServerError("Unable to write JSON response", err)
 	}
 
 	return nil
@@ -30,11 +30,7 @@ func YAML(rw http.ResponseWriter, data interface{}) *httperror.HandlerError {
 
 	strData, ok := data.(string)
 	if !ok {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to write YAML response",
-			Err:        errors.New("failed to convert input to string"),
-		}
+		return httperror.InternalServerError("Unable to write YAML response", errors.New("failed to convert input to string"))
 	}
 
 	fmt.Fprint(rw, strData)
