@@ -4,8 +4,9 @@ package error
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
+
+	"github.com/rs/zerolog/log"
 )
 
 type (
@@ -30,7 +31,8 @@ func writeErrorResponse(rw http.ResponseWriter, err *HandlerError) {
 		err.Err = errors.New(err.Message)
 	}
 
-	log.Printf("http error: %s (err=%s) (code=%d)\n", err.Message, err.Err, err.StatusCode)
+	log.Debug().Err(err.Err).Int("status_code", err.StatusCode).Str("msg", err.Message).Msg("HTTP error")
+
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(err.StatusCode)
 
