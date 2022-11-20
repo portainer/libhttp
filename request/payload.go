@@ -23,11 +23,15 @@ func DecodeAndValidateJSONPayload(request *http.Request, v PayloadValidation) er
 }
 
 // GetPayload decodes the body of the request into an object implementing the PayloadValidation interface.
-func GetPayload[T PayloadValidation](r *http.Request) (T, error) {
-	var payload T
-	err := DecodeAndValidateJSONPayload(r, payload)
+func GetPayload[T any, PT interface {
+	*T
+	Validate(request *http.Request) error
+}](r *http.Request) (PT, error) {
+	p := PT(new(T))
+
+	err := DecodeAndValidateJSONPayload(r, p)
 	if err != nil {
-		return payload, errors.WithMessage(err, "Invalid request payload")
+		return nil, errors.WithMessage(err, "Invalid request payload")
 	}
-	return payload, nil
+	return p, nil
 }
