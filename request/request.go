@@ -24,21 +24,6 @@ const (
 	ErrMissingFormDataValue = "Missing form data value"
 )
 
-// PayloadValidation is an interface used to validate the payload of a request.
-type PayloadValidation interface {
-	Validate(request *http.Request) error
-}
-
-// DecodeAndValidateJSONPayload decodes the body of the request into an object
-// implementing the PayloadValidation interface.
-// It also triggers a validation of object content.
-func DecodeAndValidateJSONPayload(request *http.Request, v PayloadValidation) error {
-	if err := json.NewDecoder(request.Body).Decode(v); err != nil {
-		return err
-	}
-	return v.Validate(request)
-}
-
 // RetrieveMultiPartFormFile returns the content of an uploaded file (form data) as bytes as well
 // as the name of the uploaded file.
 func RetrieveMultiPartFormFile(request *http.Request, requestParameter string) ([]byte, string, error) {
@@ -153,7 +138,7 @@ func RetrieveBooleanQueryParameter(request *http.Request, name string, optional 
 	return queryParameter == "true", nil
 }
 
-// RetrieveJSONQueryParameter decodes the value of a query paramater as a JSON object into the target parameter.
+// RetrieveJSONQueryParameter decodes the value of a query parameter as a JSON object into the target parameter.
 // If optional is set to true, will not return an error when the query parameter is not found.
 func RetrieveJSONQueryParameter(request *http.Request, name string, target interface{}, optional bool) error {
 	queryParameter, err := RetrieveQueryParameter(request, name, optional)
