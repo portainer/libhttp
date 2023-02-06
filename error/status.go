@@ -2,14 +2,16 @@ package error
 
 import "net/http"
 
-type (
-	// HandlerError represents an error raised inside a HTTP handler
-	HandlerError struct {
-		StatusCode int
-		Message    string
-		Err        error
-	}
-)
+// HandlerError represents an error raised inside a HTTP handler
+type HandlerError struct {
+	StatusCode int
+	Message    string
+	Err        error
+}
+
+func (h *HandlerError) Error() string {
+	return h.Message
+}
 
 func NewError(statusCode int, message string, err error) *HandlerError {
 	return &HandlerError{
