@@ -31,7 +31,7 @@ func writeErrorResponse(rw http.ResponseWriter, err *HandlerError) {
 		err.Err = errors.New(err.Message)
 	}
 
-	log.Debug().Err(err.Err).Int("status_code", err.StatusCode).Str("msg", err.Message).Msg("HTTP error")
+	log.Debug().CallerSkipFrame(2).Err(err.Err).Int("status_code", err.StatusCode).Str("msg", err.Message).Msg("HTTP error")
 
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(err.StatusCode)
