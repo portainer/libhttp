@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -27,6 +28,13 @@ const (
 // RetrieveMultiPartFormFile returns the content of an uploaded file (form data) as bytes as well
 // as the name of the uploaded file.
 func RetrieveMultiPartFormFile(request *http.Request, requestParameter string) ([]byte, string, error) {
+	maxSize, err := strconv.ParseInt(os.Getenv("MAX_UPLOAD_SIZE"), 10, 64)
+	if err == nil && maxSize > 0 {
+		if err := request.ParseMultipartForm(maxSize); err != nil {
+			return nil, "", err
+		}
+	}
+
 	file, headers, err := request.FormFile(requestParameter)
 	if err != nil {
 		return nil, "", err
